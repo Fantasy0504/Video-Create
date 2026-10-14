@@ -1,0 +1,114 @@
+{
+  "entry": {
+    "func": "reverse",
+    "args": [
+      "Node(1)"
+    ]
+  },
+  "nodes": [
+    {
+      "id": 1,
+      "label": "1→2→3→4",
+      "depth": 0,
+      "parent": null,
+      "args": [
+        "Node(1)"
+      ],
+      "result": "Node(4)"
+    },
+    {
+      "id": 2,
+      "label": "2→3→4",
+      "depth": 1,
+      "parent": 1,
+      "args": [
+        "Node(2)"
+      ],
+      "result": "Node(4)"
+    },
+    {
+      "id": 3,
+      "label": "3→4",
+      "depth": 2,
+      "parent": 2,
+      "args": [
+        "Node(3)"
+      ],
+      "result": "Node(4)"
+    },
+    {
+      "id": 4,
+      "label": "4",
+      "depth": 3,
+      "parent": 3,
+      "args": [
+        "Node(4)"
+      ],
+      "result": "Node(4)"
+    }
+  ],
+  "events": [
+    {
+      "kind": "enter",
+      "id": 1
+    },
+    {
+      "kind": "enter",
+      "id": 2
+    },
+    {
+      "kind": "enter",
+      "id": 3
+    },
+    {
+      "kind": "enter",
+      "id": 4
+    },
+    {
+      "kind": "return",
+      "id": 4,
+      "value": "Node(4)"
+    },
+    {
+      "kind": "return",
+      "id": 3,
+      "value": "Node(4)"
+    },
+    {
+      "kind": "return",
+      "id": 2,
+      "value": "Node(4)"
+    },
+    {
+      "kind": "return",
+      "id": 1,
+      "value": "Node(4)"
+    }
+  ],
+  "children": {
+    "1": [
+      2
+    ],
+    "2": [
+      3
+    ],
+    "3": [
+      4
+    ]
+  },
+  "leaf_order": [
+    4
+  ],
+  "summary": {
+    "call_count": 4,
+    "base_count": 1,
+    "max_depth": 4,
+    "label_counts": {
+      "1→2→3→4": 1,
+      "2→3→4": 1,
+      "3→4": 1,
+      "4": 1
+    },
+    "enter_return_alternates": true
+  }
+}

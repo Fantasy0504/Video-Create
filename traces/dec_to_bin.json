@@ -1,0 +1,114 @@
+{
+  "entry": {
+    "func": "dec2bin",
+    "args": [
+      13
+    ]
+  },
+  "nodes": [
+    {
+      "id": 1,
+      "label": "dec2bin(13)",
+      "depth": 0,
+      "parent": null,
+      "args": [
+        13
+      ],
+      "result": "1101"
+    },
+    {
+      "id": 2,
+      "label": "dec2bin(6)",
+      "depth": 1,
+      "parent": 1,
+      "args": [
+        6
+      ],
+      "result": "110"
+    },
+    {
+      "id": 3,
+      "label": "dec2bin(3)",
+      "depth": 2,
+      "parent": 2,
+      "args": [
+        3
+      ],
+      "result": "11"
+    },
+    {
+      "id": 4,
+      "label": "dec2bin(1)",
+      "depth": 3,
+      "parent": 3,
+      "args": [
+        1
+      ],
+      "result": "1"
+    }
+  ],
+  "events": [
+    {
+      "kind": "enter",
+      "id": 1
+    },
+    {
+      "kind": "enter",
+      "id": 2
+    },
+    {
+      "kind": "enter",
+      "id": 3
+    },
+    {
+      "kind": "enter",
+      "id": 4
+    },
+    {
+      "kind": "return",
+      "id": 4,
+      "value": "1"
+    },
+    {
+      "kind": "return",
+      "id": 3,
+      "value": "11"
+    },
+    {
+      "kind": "return",
+      "id": 2,
+      "value": "110"
+    },
+    {
+      "kind": "return",
+      "id": 1,
+      "value": "1101"
+    }
+  ],
+  "children": {
+    "1": [
+      2
+    ],
+    "2": [
+      3
+    ],
+    "3": [
+      4
+    ]
+  },
+  "leaf_order": [
+    4
+  ],
+  "summary": {
+    "call_count": 4,
+    "base_count": 1,
+    "max_depth": 4,
+    "label_counts": {
+      "dec2bin(13)": 1,
+      "dec2bin(6)": 1,
+      "dec2bin(3)": 1,
+      "dec2bin(1)": 1
+    },
+    "enter_return_alternates": true
+  }
+}

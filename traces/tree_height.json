@@ -1,0 +1,309 @@
+{
+  "entry": {
+    "func": "height",
+    "args": [
+      "T(root)"
+    ]
+  },
+  "nodes": [
+    {
+      "id": 1,
+      "label": "root",
+      "depth": 0,
+      "parent": null,
+      "args": [
+        "T(root)"
+      ],
+      "result": 4
+    },
+    {
+      "id": 2,
+      "label": "L",
+      "depth": 1,
+      "parent": 1,
+      "args": [
+        "T(L)"
+      ],
+      "result": 3
+    },
+    {
+      "id": 3,
+      "label": "LL",
+      "depth": 2,
+      "parent": 2,
+      "args": [
+        "T(LL)"
+      ],
+      "result": 2
+    },
+    {
+      "id": 4,
+      "label": "LLL",
+      "depth": 3,
+      "parent": 3,
+      "args": [
+        "T(LLL)"
+      ],
+      "result": 1
+    },
+    {
+      "id": 5,
+      "label": "∅",
+      "depth": 4,
+      "parent": 4,
+      "args": [
+        null
+      ],
+      "result": 0
+    },
+    {
+      "id": 6,
+      "label": "∅",
+      "depth": 4,
+      "parent": 4,
+      "args": [
+        null
+      ],
+      "result": 0
+    },
+    {
+      "id": 7,
+      "label": "∅",
+      "depth": 3,
+      "parent": 3,
+      "args": [
+        null
+      ],
+      "result": 0
+    },
+    {
+      "id": 8,
+      "label": "LR",
+      "depth": 2,
+      "parent": 2,
+      "args": [
+        "T(LR)"
+      ],
+      "result": 1
+    },
+    {
+      "id": 9,
+      "label": "∅",
+      "depth": 3,
+      "parent": 8,
+      "args": [
+        null
+      ],
+      "result": 0
+    },
+    {
+      "id": 10,
+      "label": "∅",
+      "depth": 3,
+      "parent": 8,
+      "args": [
+        null
+      ],
+      "result": 0
+    },
+    {
+      "id": 11,
+      "label": "R",
+      "depth": 1,
+      "parent": 1,
+      "args": [
+        "T(R)"
+      ],
+      "result": 1
+    },
+    {
+      "id": 12,
+      "label": "∅",
+      "depth": 2,
+      "parent": 11,
+      "args": [
+        null
+      ],
+      "result": 0
+    },
+    {
+      "id": 13,
+      "label": "∅",
+      "depth": 2,
+      "parent": 11,
+      "args": [
+        null
+      ],
+      "result": 0
+    }
+  ],
+  "events": [
+    {
+      "kind": "enter",
+      "id": 1
+    },
+    {
+      "kind": "enter",
+      "id": 2
+    },
+    {
+      "kind": "enter",
+      "id": 3
+    },
+    {
+      "kind": "enter",
+      "id": 4
+    },
+    {
+      "kind": "enter",
+      "id": 5
+    },
+    {
+      "kind": "return",
+      "id": 5,
+      "value": 0
+    },
+    {
+      "kind": "enter",
+      "id": 6
+    },
+    {
+      "kind": "return",
+      "id": 6,
+      "value": 0
+    },
+    {
+      "kind": "return",
+      "id": 4,
+      "value": 1
+    },
+    {
+      "kind": "enter",
+      "id": 7
+    },
+    {
+      "kind": "return",
+      "id": 7,
+      "value": 0
+    },
+    {
+      "kind": "return",
+      "id": 3,
+      "value": 2
+    },
+    {
+      "kind": "enter",
+      "id": 8
+    },
+    {
+      "kind": "enter",
+      "id": 9
+    },
+    {
+      "kind": "return",
+      "id": 9,
+      "value": 0
+    },
+    {
+      "kind": "enter",
+      "id": 10
+    },
+    {
+      "kind": "return",
+      "id": 10,
+      "value": 0
+    },
+    {
+      "kind": "return",
+      "id": 8,
+      "value": 1
+    },
+    {
+      "kind": "return",
+      "id": 2,
+      "value": 3
+    },
+    {
+      "kind": "enter",
+      "id": 11
+    },
+    {
+      "kind": "enter",
+      "id": 12
+    },
+    {
+      "kind": "return",
+      "id": 12,
+      "value": 0
+    },
+    {
+      "kind": "enter",
+      "id": 13
+    },
+    {
+      "kind": "return",
+      "id": 13,
+      "value": 0
+    },
+    {
+      "kind": "return",
+      "id": 11,
+      "value": 1
+    },
+    {
+      "kind": "return",
+      "id": 1,
+      "value": 4
+    }
+  ],
+  "children": {
+    "1": [
+      2,
+      11
+    ],
+    "2": [
+      3,
+      8
+    ],
+    "3": [
+      4,
+      7
+    ],
+    "4": [
+      5,
+      6
+    ],
+    "8": [
+      9,
+      10
+    ],
+    "11": [
+      12,
+      13
+    ]
+  },
+  "leaf_order": [
+    5,
+    6,
+    7,
+    9,
+    10,
+    12,
+    13
+  ],
+  "summary": {
+    "call_count": 13,
+    "base_count": 7,
+    "max_depth": 5,
+    "label_counts": {
+      "root": 1,
+      "L": 1,
+      "LL": 1,
+      "LLL": 1,
+      "∅": 7,
+      "LR": 1,
+      "R": 1
+    },
+    "enter_return_alternates": true
+  }
+}

@@ -1,0 +1,22 @@
+# 算法动画模板的 Python 依赖
+#
+# manimgl 会自行解析它自己的依赖（ManimPango / numpy / scipy / Pillow /
+# moderngl / moderngl-window / PyOpenGL / pyglet / sympy / matplotlib /
+# colour / addict / diskcache / isosurfaces / mapbox-earcut / pydub /
+# pygments / rich / screeninfo / skia-pathops / svgelements / tqdm /
+# validators 等），一般不需要在下面手动写一遍。
+#
+# 下面是本项目实际验证过的版本组合，想精确复现时把注释去掉即可：
+#   ManimPango==0.7.0     numpy==2.5.4       scipy==1.18.1
+#   Pillow==12.3.0        moderngl==5.13.0   matplotlib==3.11.2
+#   sympy==1.14.0         ipython==9.17.1    fonttools==4.66.1
+#
+# 另有系统级依赖，pip 装不了，需要单独准备：
+#   * ffmpeg   必须在 PATH 里，manimgl 用它把帧合成 MP4
+#   * 中文字体 思源黑体 / Noto Sans CJK SC / 微软雅黑 / 苹方，任意一个即可
+#              （engine/theme.py 会自动挑，一个都没有会回退并可能缺字）
+#
+# 装完跑一次自检确认：
+#   python tools/check_env.py
+
+manimgl==1.7.2

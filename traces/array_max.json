@@ -1,0 +1,392 @@
+{
+  "entry": {
+    "func": "max_of",
+    "args": [
+      "[7, 2, 9, 4, 1, 8, 3, 6]",
+      0,
+      8
+    ]
+  },
+  "nodes": [
+    {
+      "id": 1,
+      "label": "[0,8)",
+      "depth": 0,
+      "parent": null,
+      "args": [
+        "[7, 2, 9, 4, 1, 8, 3, 6]",
+        0,
+        8
+      ],
+      "result": 9
+    },
+    {
+      "id": 2,
+      "label": "[0,4)",
+      "depth": 1,
+      "parent": 1,
+      "args": [
+        "[7, 2, 9, 4, 1, 8, 3, 6]",
+        0,
+        4
+      ],
+      "result": 9
+    },
+    {
+      "id": 3,
+      "label": "[0,2)",
+      "depth": 2,
+      "parent": 2,
+      "args": [
+        "[7, 2, 9, 4, 1, 8, 3, 6]",
+        0,
+        2
+      ],
+      "result": 7
+    },
+    {
+      "id": 4,
+      "label": "[0,1)",
+      "depth": 3,
+      "parent": 3,
+      "args": [
+        "[7, 2, 9, 4, 1, 8, 3, 6]",
+        0,
+        1
+      ],
+      "result": 7
+    },
+    {
+      "id": 5,
+      "label": "[1,2)",
+      "depth": 3,
+      "parent": 3,
+      "args": [
+        "[7, 2, 9, 4, 1, 8, 3, 6]",
+        1,
+        2
+      ],
+      "result": 2
+    },
+    {
+      "id": 6,
+      "label": "[2,4)",
+      "depth": 2,
+      "parent": 2,
+      "args": [
+        "[7, 2, 9, 4, 1, 8, 3, 6]",
+        2,
+        4
+      ],
+      "result": 9
+    },
+    {
+      "id": 7,
+      "label": "[2,3)",
+      "depth": 3,
+      "parent": 6,
+      "args": [
+        "[7, 2, 9, 4, 1, 8, 3, 6]",
+        2,
+        3
+      ],
+      "result": 9
+    },
+    {
+      "id": 8,
+      "label": "[3,4)",
+      "depth": 3,
+      "parent": 6,
+      "args": [
+        "[7, 2, 9, 4, 1, 8, 3, 6]",
+        3,
+        4
+      ],
+      "result": 4
+    },
+    {
+      "id": 9,
+      "label": "[4,8)",
+      "depth": 1,
+      "parent": 1,
+      "args": [
+        "[7, 2, 9, 4, 1, 8, 3, 6]",
+        4,
+        8
+      ],
+      "result": 8
+    },
+    {
+      "id": 10,
+      "label": "[4,6)",
+      "depth": 2,
+      "parent": 9,
+      "args": [
+        "[7, 2, 9, 4, 1, 8, 3, 6]",
+        4,
+        6
+      ],
+      "result": 8
+    },
+    {
+      "id": 11,
+      "label": "[4,5)",
+      "depth": 3,
+      "parent": 10,
+      "args": [
+        "[7, 2, 9, 4, 1, 8, 3, 6]",
+        4,
+        5
+      ],
+      "result": 1
+    },
+    {
+      "id": 12,
+      "label": "[5,6)",
+      "depth": 3,
+      "parent": 10,
+      "args": [
+        "[7, 2, 9, 4, 1, 8, 3, 6]",
+        5,
+        6
+      ],
+      "result": 8
+    },
+    {
+      "id": 13,
+      "label": "[6,8)",
+      "depth": 2,
+      "parent": 9,
+      "args": [
+        "[7, 2, 9, 4, 1, 8, 3, 6]",
+        6,
+        8
+      ],
+      "result": 6
+    },
+    {
+      "id": 14,
+      "label": "[6,7)",
+      "depth": 3,
+      "parent": 13,
+      "args": [
+        "[7, 2, 9, 4, 1, 8, 3, 6]",
+        6,
+        7
+      ],
+      "result": 3
+    },
+    {
+      "id": 15,
+      "label": "[7,8)",
+      "depth": 3,
+      "parent": 13,
+      "args": [
+        "[7, 2, 9, 4, 1, 8, 3, 6]",
+        7,
+        8
+      ],
+      "result": 6
+    }
+  ],
+  "events": [
+    {
+      "kind": "enter",
+      "id": 1
+    },
+    {
+      "kind": "enter",
+      "id": 2
+    },
+    {
+      "kind": "enter",
+      "id": 3
+    },
+    {
+      "kind": "enter",
+      "id": 4
+    },
+    {
+      "kind": "return",
+      "id": 4,
+      "value": 7
+    },
+    {
+      "kind": "enter",
+      "id": 5
+    },
+    {
+      "kind": "return",
+      "id": 5,
+      "value": 2
+    },
+    {
+      "kind": "return",
+      "id": 3,
+      "value": 7
+    },
+    {
+      "kind": "enter",
+      "id": 6
+    },
+    {
+      "kind": "enter",
+      "id": 7
+    },
+    {
+      "kind": "return",
+      "id": 7,
+      "value": 9
+    },
+    {
+      "kind": "enter",
+      "id": 8
+    },
+    {
+      "kind": "return",
+      "id": 8,
+      "value": 4
+    },
+    {
+      "kind": "return",
+      "id": 6,
+      "value": 9
+    },
+    {
+      "kind": "return",
+      "id": 2,
+      "value": 9
+    },
+    {
+      "kind": "enter",
+      "id": 9
+    },
+    {
+      "kind": "enter",
+      "id": 10
+    },
+    {
+      "kind": "enter",
+      "id": 11
+    },
+    {
+      "kind": "return",
+      "id": 11,
+      "value": 1
+    },
+    {
+      "kind": "enter",
+      "id": 12
+    },
+    {
+      "kind": "return",
+      "id": 12,
+      "value": 8
+    },
+    {
+      "kind": "return",
+      "id": 10,
+      "value": 8
+    },
+    {
+      "kind": "enter",
+      "id": 13
+    },
+    {
+      "kind": "enter",
+      "id": 14
+    },
+    {
+      "kind": "return",
+      "id": 14,
+      "value": 3
+    },
+    {
+      "kind": "enter",
+      "id": 15
+    },
+    {
+      "kind": "return",
+      "id": 15,
+      "value": 6
+    },
+    {
+      "kind": "return",
+      "id": 13,
+      "value": 6
+    },
+    {
+      "kind": "return",
+      "id": 9,
+      "value": 8
+    },
+    {
+      "kind": "return",
+      "id": 1,
+      "value": 9
+    }
+  ],
+  "children": {
+    "1": [
+      2,
+      9
+    ],
+    "2": [
+      3,
+      6
+    ],
+    "3": [
+      4,
+      5
+    ],
+    "6": [
+      7,
+      8
+    ],
+    "9": [
+      10,
+      13
+    ],
+    "10": [
+      11,
+      12
+    ],
+    "13": [
+      14,
+      15
+    ]
+  },
+  "leaf_order": [
+    4,
+    5,
+    7,
+    8,
+    11,
+    12,
+    14,
+    15
+  ],
+  "summary": {
+    "call_count": 15,
+    "base_count": 8,
+    "max_depth": 4,
+    "label_counts": {
+      "[0,8)": 1,
+      "[0,4)": 1,
+      "[0,2)": 1,
+      "[0,1)": 1,
+      "[1,2)": 1,
+      "[2,4)": 1,
+      "[2,3)": 1,
+      "[3,4)": 1,
+      "[4,8)": 1,
+      "[4,6)": 1,
+      "[4,5)": 1,
+      "[5,6)": 1,
+      "[6,8)": 1,
+      "[6,7)": 1,
+      "[7,8)": 1
+    },
+    "enter_return_alternates": true
+  }
+}
