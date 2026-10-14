@@ -189,6 +189,11 @@ class TreeView:
                           font_size=size, color=theme.WHITE)
                 for nid in self.spec.ids}
 
+    def _has_child_below(self, nid):
+        """有没有子节点正好在正下方（单支递归就是这样）。"""
+        return any(abs(float(self.pos[c][0]) - float(self.pos[nid][0])) < 1e-6
+                   for c in self.spec.children.get(nid, []))
+
     def _rows(self):
         """按深度分组，每层的 x 坐标（升序）。"""
         rows: dict[int, list[float]] = {}
@@ -300,6 +305,11 @@ class TreeView:
         value = Text(text, font=theme.mono_font(),
                      font_size=theme.SIZE_VALUE, color=theme.GREEN)
         value.next_to(self.nodes[nid], DOWN, buff=0.045)
+        # 有子节点正好在正下方时（单支递归），父子连线也是竖直的，
+        # 值标签压在线上会被穿过（PRD 2.4：线条不能穿过文字）。
+        # 往右让开一点，避开那条线。
+        if self._has_child_below(nid):
+            value.shift(RIGHT * (self.node_w / 2 + 0.20))
         self.scene.play(FadeIn(value, shift=UP * 0.05), run_time=run_time)
         self.scene.wait(hold)
         if send:
