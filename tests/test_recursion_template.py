@@ -89,7 +89,8 @@ class TraceTests(unittest.TestCase):
         # 验证事件逻辑时替换图形依赖；不声称由此验证实际渲染布局。
         cls.saved = {k: sys.modules.get(k) for k in
                      ('manimlib', '_recursion_test', '_recursion_test.scene',
-                      '_recursion_test.tree', '_recursion_test.stack_state')}
+                      '_recursion_test.tree', '_recursion_test.stack_state',
+                      '_recursion_test.panel', '_recursion_test.theme')}
         sys.modules['manimlib'] = types.ModuleType('manimlib')
         pkg = types.ModuleType('_recursion_test')
         pkg.__path__ = []
@@ -101,6 +102,12 @@ class TraceTests(unittest.TestCase):
         tree.TreeSpec = type('TreeSpec', (), {'__init__': lambda self, *args: None})
         sys.modules['_recursion_test.tree'] = tree
         sys.modules['_recursion_test.stack_state'] = state
+        panel = types.ModuleType('_recursion_test.panel')
+        panel.curtain = panel.complexity_row = panel.wrapped_rows = lambda *a, **kw: None
+        sys.modules['_recursion_test.panel'] = panel
+        theme = types.ModuleType('_recursion_test.theme')
+        theme.WHITE = '#FFFFFF'
+        sys.modules['_recursion_test.theme'] = theme
         cls.runtime = load('_recursion_test.recursion', 'engine/recursion.py')
 
     @classmethod
@@ -114,6 +121,7 @@ class TraceTests(unittest.TestCase):
     def make(self, payload):
         obj = self.runtime.RecursionScene()
         obj.TRACE = payload
+        obj.SUMMARY_DATA = {'result': '真实结果', 'time': ['时间复杂度', '', 'n'], 'space': ['辅助空间', '', 'n']}
         obj.CODE_SOURCE = ('entry', 'call1', 'call2', 'call3', 'ret', 'base')
         obj.CODE_LINES = {'enter': 0, 'call': [1, 2, 3], 'return': 4, 'leaf_return': 5}
         return obj
@@ -160,7 +168,10 @@ class TraceTests(unittest.TestCase):
                     self.assertEqual(panel.stack.current.call_id, nid)
                     returned.append(nid)
                 obj.add_tree = lambda spec: types.SimpleNamespace(root=noop, enter=noop, return_value=on_return)
+                conclusions = []
+                obj.show_conclusion = lambda: conclusions.append(True)
                 obj.build()
+                self.assertEqual(conclusions, [True])
                 self.assertFalse(panel.stack.frames)
                 self.assertEqual(returned, [e['id'] for e in payload['events'] if e['kind'] == 'return'])
 
@@ -185,10 +196,21 @@ class TraceTests(unittest.TestCase):
         for path in (ROOT / 'traces').glob('*.json'):
             payload = json.loads(path.read_text())
             source = scaffold.build_source(payload, 'Demo', '标题', '', ['void f() {}'],
-                                           path.name, {'enter': 0, 'call': [0, 0, 0], 'return': 0, 'leaf_return': 0})
+                                           path.name, {'enter': 0, 'call': [0, 0, 0], 'return': 0, 'leaf_return': 0},
+                                           conclusion={'result': '已完成', 'time': ['时间', '', 'n'], 'space': ['空间', '', 'n']})
             ast.parse(source)
             self.assertNotIn('left + right', source)
             self.assertIn('RecursionScene', source)
+
+    def test_summary_is_required_and_validated(self):
+        obj = self.make(json.loads((ROOT / 'traces/fib.json').read_text()))
+        obj.validate_summary()
+        obj.SUMMARY_DATA = None
+        with self.assertRaises(ValueError):
+            obj.validate_summary()
+        obj.SUMMARY_DATA = {'result': '完成', 'time': ['时间', '', 'n']}
+        with self.assertRaises(ValueError):
+            obj.validate_summary()
 
     def test_generator_requires_real_code_and_mapping(self):
         with self.assertRaises(ValueError):

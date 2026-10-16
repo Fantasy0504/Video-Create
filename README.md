@@ -311,7 +311,7 @@ python tools/scaffold.py traces/fib.json \
     --title "非记忆化递归" --tag "fib(5)" \
     --code examples/fibonacci_recursion/code.cpp \
     --bindings examples/fibonacci_recursion/bindings.json \
-    --params n --receivers left,right
+    --params n --receivers left,right --conclusion examples/fibonacci_recursion/conclusion.json
 ```
 
 步骤 2 顺带会报告一份核对清单：调用次数、基础情况次数、各参数出现次数、

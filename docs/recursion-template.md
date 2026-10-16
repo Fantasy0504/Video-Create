@@ -15,7 +15,7 @@
 先准备真实 trace、展示用 C++ 和行号映射：
 
 ```bash
-python tools/scaffold.py traces/fib.json --out examples/fibonacci_recursion/scene_gen.py --class FibonacciGen --title "非记忆化递归" --tag "fib(5)" --code examples/fibonacci_recursion/code.cpp --bindings examples/fibonacci_recursion/bindings.json --params n --receivers left,right
+python tools/scaffold.py traces/fib.json --out examples/fibonacci_recursion/scene_gen.py --class FibonacciGen --title "非记忆化递归" --tag "fib(5)" --code examples/fibonacci_recursion/code.cpp --bindings examples/fibonacci_recursion/bindings.json --params n --receivers left,right --conclusion examples/fibonacci_recursion/conclusion.json
 python tools/render.py examples/fibonacci_recursion/scene_gen.py --scene FibonacciGen
 ```
 
@@ -33,6 +33,14 @@ python tools/render.py examples/fibonacci_recursion/scene_gen.py --scene Fibonac
 不同调用若具有不同的条件分支/返回位置，不应强套上述默认映射：为对应事件填写 `line`，进入事件可填 `entry_line`，返回事件可填 `resume_line`。模板只记录真实调用与返回边界，不能自动推断中间的判断、循环、恢复现场和局部变量赋值。需要逐语句讲解时，必须扩展本期分镜，不能将边界模板宣称为完整逐语句追踪。
 
 事件可补充 `locals`、`caption`；返回事件还可填 `receiver`。无返回值调用设置 `has_value: false`，若算法确实返回空值则显式设置 `has_value: true`。任何未被执行记录确认的局部变量都不得预填将来结果。
+
+## 结尾总结
+
+结尾参考 `3162.mp4`：过程图压暗，依次居中显示白色大字结果、一句关键结论、时间复杂度和空间复杂度，全部出现后停留至少约 3 秒。过程部分仍参考 `3163.mp4`。
+
+`--conclusion` 必须指向本期 JSON，结构示例见 `examples/fibonacci_recursion/conclusion.json`。其中 `result` 是真实输入的实际结果，`takeaway` 是一句要点；`time` 和 `space` 各为三项 `[标签, 指数底数或空串, 指数或复杂度正文]`。无指数时底数为空；指数通过分开排版显示，不写成普通同行字符。
+
+复杂度需由制作者按具体代码分析，不能由 trace 的调用数量推断。空间注明辅助空间或仅栈空间，计入同时存活的额外结构；输入符号、最坏/平均情况及输出空间口径在 PRD 中说明。无返回值算法应在结果栏填写实际操作终态，不自动编造数值。
 
 ## 手写分镜
 

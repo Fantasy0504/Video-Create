@@ -19,6 +19,7 @@ class FibonacciGen(RecursionScene):
     CODE_LINES = {'enter': 0, 'call': [2, 3], 'return': 4, 'leaf_return': 1}
     PARAM_NAMES = ('n',)
     RECEIVERS = ('left', 'right')
+    SUMMARY_DATA = {'result': 'fib(5) = 5', 'takeaway': '相同子问题，会重复计算', 'time': ['时间上界  ', '2', 'n'], 'space': ['辅助空间（调用栈）  ', '', 'n']}
     TRACE = {'entry': {'func': 'fib', 'args': [5]},
  'nodes': [{'id': 1, 'label': 'fib(5)', 'depth': 0, 'parent': None, 'args': [5], 'result': 5},
            {'id': 2, 'label': 'fib(4)', 'depth': 1, 'parent': 1, 'args': [4], 'result': 3},

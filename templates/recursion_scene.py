@@ -17,6 +17,12 @@ class MyRecursion(RecursionScene):
     CODE_LINES = {}   # enter/call/return/leaf_return，或事件内的 line
     PARAM_NAMES = ()  # 与 trace 的 args 顺序一致
     RECEIVERS = ()    # 可选：真实接收变量；不预设 left/right
+    # 必填：使用实际结果、算法渐近时间与辅助空间；不是渲染程序的开销。
+    SUMMARY_DATA = None
+    # 结构：{'result': '本期实际结果', 'takeaway': '一句关键结论',
+    #        'time': ['时间复杂度', '', '按算法填写'],
+    #        'space': ['辅助空间', '', '按算法填写']}
+    # 指数公式通过 time/space 的后两项拆开排版，不能用普通同行文字伪造上标。
     TRACE = {}        # nodes/children/leaf_order/events 的真实执行记录
 
     # 如需补充基本条件判断、循环或撤销操作，覆写 build() 分镜。
