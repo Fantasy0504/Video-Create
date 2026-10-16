@@ -5,7 +5,7 @@
 ## 默认实现
 
 - 调用与返回必须有动态方向箭头：蓝色从调用者指向子调用（上下布局时向下），绿色从子调用指回直接调用者（向上）。使用 `GrowArrow` 从起点到终点绘制，不能仅换色或静态显示；返回数据在绿色箭头出现后沿相同方向移动。根调用返回到外部时不虚构父调用框。
-- 箭头采用细线风格，不遮挡调用框、代码和文字。统一复用 `engine.flow.recursion_arrow`：ManimGL 实心箭身 `thickness=1.2`、`stroke_width=0`、`tip_width_ratio=3.0`、`max_tip_length_to_length_ratio=0.16`；直角接入段 `Line.stroke_width=1.6`，移动点半径 `0.035`。1080p 下常规箭身约 2.4px。`Arrow.stroke_width` 控制轮廓而非实心箭身，不能用它代替 `thickness`。短边按长度自动限制头部。
+- 箭头采用细线风格，不遮挡调用框、代码和文字。统一复用 `engine.flow.recursion_arrow`：ManimGL 实心箭身 `thickness=1.2`、`stroke_width=0`、`tip_width_ratio=8.0`、`max_tip_length_to_length_ratio=0.32`；直角接入段 `Line.stroke_width=1.6`，移动点半径 `0.035`。1080p 下常规箭身约 2.4px，三角尖端约 19px 宽、17px 长；正常播放时方向必须清晰，不因调细箭身而让尖端也变得难辨。`Arrow.stroke_width` 控制轮廓而非实心箭身，不能用它代替 `thickness`。短边按长度自动限制头部。
 - `TreeView.enter()` 默认动态绘制蓝色细箭头；`send_up()` 在原调用关系上改为反向绿色细箭头。手写调用记录视图也须复用同一组件；先移除旧方向箭头，再绘制反向箭头，避免头部重叠。
 
 - `CodePanel.focus()`：当前代码文字与侧边光标蓝色，旧语句恢复白色；可传连续多行的列表。原位改色，不叠加代码副本。透明行框保留原始缩进。
