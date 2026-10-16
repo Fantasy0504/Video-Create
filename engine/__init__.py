@@ -10,6 +10,7 @@
 """
 from . import theme
 from .array import ArrayView
+from .flow import recursion_arrow
 from .hanoi import HanoiView
 from .layout import Region
 from .linkedlist import LinkedListView
@@ -21,6 +22,7 @@ from .tree import TreeSpec, TreeView
 
 __all__ = [
     "theme",
+    "recursion_arrow",
     "AlgoScene",
     "RecursionScene",
     "Beat",

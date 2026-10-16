@@ -23,6 +23,7 @@ import numpy as np
 from manimlib import *
 
 from . import theme
+from .flow import recursion_arrow
 
 
 def border_point(center, toward, node_w, node_h, gap=0.025):
@@ -171,13 +172,13 @@ class TreeView:
             self.nodes[nid] = VGroup(box, labels[nid]).move_to(self.pos[nid])
             parent = spec.parent[nid]
             if parent is not None:
-                edge = Line(
+                edge = recursion_arrow(
                     border_point(self.pos[parent], self.pos[nid],
                                  self.node_w, node_h),
                     border_point(self.pos[nid], self.pos[parent],
                                  self.node_w, node_h),
                 )
-                edge.set_stroke(theme.WHITE, width=1.5)
+                edge.set_color(theme.WHITE)
                 self.edges[nid] = edge
 
         self.all_nodes = VGroup(*self.nodes.values())
@@ -237,7 +238,7 @@ class TreeView:
             color, width = self._STYLE[self._state_of(nid)]
             anims.append(self.boxes[nid].animate.set_stroke(color, width=width))
             if nid in self.edges:
-                anims.append(self.edges[nid].animate.set_stroke(color, width=width))
+                anims.append(self.edges[nid].animate.set_color(color))
         return anims
 
     def refresh(self, run_time=0.28):
@@ -268,8 +269,8 @@ class TreeView:
         self.boxes[nid].set_stroke(theme.BLUE, width=2.7)
         anims = [FadeIn(self.nodes[nid], scale=0.82)]
         if parent is not None:
-            self.edges[nid].set_stroke(theme.BLUE, width=2.7)
-            anims.append(ShowCreation(self.edges[nid]))
+            self.edges[nid].set_color(theme.BLUE)
+            anims.append(GrowArrow(self.edges[nid]))
         anims.extend(self._color_anims(skip={nid}))
         self.scene.play(*anims, run_time=run_time)
         if hold:
@@ -293,7 +294,7 @@ class TreeView:
         for nid in self.spec.ids:
             self.visited.add(nid)
         self.scene.play(LaggedStart(
-            *[ShowCreation(e) for e in self.edges.values()],
+            *[GrowArrow(e) for e in self.edges.values()],
             *[FadeIn(n, scale=0.85) for n in self.nodes.values()],
             lag_ratio=0.05), run_time=run_time)
 
@@ -318,16 +319,21 @@ class TreeView:
         if finish:
             self.finish(nid)
 
-    def send_up(self, nid, mob=None, run_time=0.24):
-        """一个绿色小点沿父子边回到父节点，代表真实的数据回传。"""
+    def send_up(self, nid, mob=None, run_time=0.65):
+        """绿色细箭头从子调用指回直接调用者，再沿箭头传回数据。"""
         parent = self.spec.parent[nid]
         if parent is None:
             return
-        start = mob.get_center() if mob is not None else self.nodes[nid].get_center()
-        target = border_point(self.pos[parent], start,
-                              self.node_w, self.node_h, gap=0.06)
+        start = border_point(self.pos[nid], self.pos[parent],
+                             self.node_w, self.node_h)
+        target = border_point(self.pos[parent], self.pos[nid],
+                              self.node_w, self.node_h)
+        edge = self.edges[nid]
+        self.scene.remove(edge)
+        edge.become(recursion_arrow(start, target, returning=True))
+        self.scene.play(GrowArrow(edge), run_time=max(0.55, run_time))
         path = Line(start, target)
-        dot = Dot(path.get_start(), radius=0.05)
+        dot = Dot(path.get_start(), radius=0.035)
         dot.set_fill(theme.GREEN, opacity=1.0)
         dot.set_stroke(width=0)
         self.scene.add(dot)

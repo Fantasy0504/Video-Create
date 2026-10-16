@@ -7,7 +7,7 @@ from pathlib import Path
 
 _ROOT = next(p for p in Path(__file__).resolve().parents if (p / 'engine').is_dir())
 sys.path.insert(0, str(_ROOT))
-from engine import RecursionScene
+from engine import RecursionScene, recursion_arrow
 
 
 class MyRecursion(RecursionScene):
@@ -32,4 +32,13 @@ class MyRecursion(RecursionScene):
     # panel.update(state='等待子调用返回')
     # panel.pop(call_id, value, receiver='真实变量名')
     # 无返回值：panel.pop(call_id, has_value=False)
+    # TreeView 已默认使用动态细箭头：蓝色指向子调用，绿色指回直接调用者。
+    # 手写栈/调用记录可复用统一样式，start/end 应位于框外且不穿过文字：
+    # call = recursion_arrow(parent_border, child_border)
+    # self.play(GrowArrow(call), run_time=0.65)
+    # ret = recursion_arrow(child_border, parent_border, returning=True)
+    # self.play(FadeOut(call), run_time=0.2)  # 先移除旧箭头，避免方向重叠
+    # self.play(GrowArrow(ret), run_time=0.65)
+    # GrowArrow/FadeOut 由 from manimlib import GrowArrow, FadeOut 导入。
+    # 不要用 stroke_width 调整实心箭身；统一参数见 engine/flow.py。
     # 详细用法见 docs/recursion-template.md。

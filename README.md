@@ -4,6 +4,9 @@
 
 当前递归模板按 `3163.mp4`：执行代码文字标蓝、底部字幕整幅居中、代码下方显示当前栈帧。见 **[通用递归模板](docs/recursion-template.md)**，可复制 `templates/recursion_scene.py` 或用生成器生成。
 
+调用方向默认使用动态细箭头：蓝色指向子调用，绿色反向指回直接调用者。
+统一组件为 `engine.flow.recursion_arrow`；[递归求链表平均值示例与成片](examples/linked_list_average/README.md)展示向下调用与向上返回。
+
 内置一套视觉与节奏规范（纯黑背景、白蓝红绿四色、分步变化后留出阅读时间），
 你只需要描述**这一期要讲什么算法**，引擎负责把它渲染成 1080p 视频。
 

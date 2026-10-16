@@ -1,0 +1,77 @@
+[
+  {
+    "event": "enter",
+    "id": 1,
+    "data": 1,
+    "n": 3
+  },
+  {
+    "event": "enter",
+    "id": 2,
+    "data": 2,
+    "n": 2
+  },
+  {
+    "event": "arrow_call",
+    "source": 1,
+    "target": 2,
+    "value": null,
+    "direction": "down"
+  },
+  {
+    "event": "enter",
+    "id": 3,
+    "data": 3,
+    "n": 1
+  },
+  {
+    "event": "arrow_call",
+    "source": 2,
+    "target": 3,
+    "value": null,
+    "direction": "down"
+  },
+  {
+    "event": "arrow_return",
+    "source": 3,
+    "target": 2,
+    "value": 3.0,
+    "direction": "up"
+  },
+  {
+    "event": "return",
+    "id": 3,
+    "value": 3.0
+  },
+  {
+    "event": "assign",
+    "id": 2,
+    "ave": 3.0,
+    "data": 2,
+    "n": 2
+  },
+  {
+    "event": "arrow_return",
+    "source": 2,
+    "target": 1,
+    "value": 2.5,
+    "direction": "up"
+  },
+  {
+    "event": "return",
+    "id": 2,
+    "value": 2.5
+  },
+  {
+    "event": "assign",
+    "id": 1,
+    "ave": 2.5,
+    "data": 1,
+    "n": 3
+  },
+  {
+    "event": "return",
+    "id": 1,
+    "value": 2.0
+  }
+]
