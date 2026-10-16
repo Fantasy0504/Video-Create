@@ -13,14 +13,16 @@ from .array import ArrayView
 from .hanoi import HanoiView
 from .layout import Region
 from .linkedlist import LinkedListView
-from .panel import (CodePanel, HintLine, StaticPanel, StatusLine, TitleBar,
+from .panel import (CodePanel, HintLine, StaticPanel, StackPanel, StatusLine, TitleBar,
                     complexity_row, curtain)
 from .scene import AlgoScene, Beat
+from .recursion import RecursionScene
 from .tree import TreeSpec, TreeView
 
 __all__ = [
     "theme",
     "AlgoScene",
+    "RecursionScene",
     "Beat",
     "Region",
     "TreeSpec",
@@ -30,6 +32,7 @@ __all__ = [
     "LinkedListView",
     "CodePanel",
     "StatusLine",
+    "StackPanel",
     "StaticPanel",
     "HintLine",
     "TitleBar",

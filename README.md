@@ -2,6 +2,8 @@
 
 把"做一支算法讲解动画"变成一件有规范、可复用的事。
 
+当前递归模板按 `3163.mp4`：执行代码文字标蓝、底部字幕整幅居中、代码下方显示当前栈帧。见 **[通用递归模板](docs/recursion-template.md)**，可复制 `templates/recursion_scene.py` 或用生成器生成。
+
 内置一套视觉与节奏规范（纯黑背景、白蓝红绿四色、分步变化后留出阅读时间），
 你只需要描述**这一期要讲什么算法**，引擎负责把它渲染成 1080p 视频。
 
@@ -128,9 +130,13 @@ python tools/render.py examples/bubble_sort/scene.py
 engine/              通用引擎（核心）
   theme.py           颜色与跨平台字体选择
   scene.py           AlgoScene 基类：背景、布局、节奏常量
-  panel.py           标题 / 代码面板 / 状态行 / 底部提示 / 结论页
+  panel.py           标题 / 蓝色执行代码 / 栈帧详情 / 居中字幕 / 结论页
+  recursion.py       通用递归事件场景
+  stack_state.py     独立保存每层现场的活动调用栈
+  text_layout.py     按实际字宽换行
   tree.py            递归树：TreeSpec + TreeView
   array.py           数组：ArrayView
+templates/recursion_scene.py   可复制的通用递归模板
 examples/            示例（每个示例一个目录，互不依赖）
   fibonacci_recursion/   递归树结构
   binary_search/         数组 + 双指针结构
@@ -165,7 +171,7 @@ class MyScene(AlgoScene):
 ```python
 code = self.add_code()                  # 显示并返回面板
 code.bind(sig=0, base=1, left=2)        # 给行起名字
-code.focus(self, "base")                # 蓝色光标移到这一行
+code.focus(self, "base")                # 这一行文字与光标变蓝，旧行恢复白色
 code.focus_now("base")                  # 不播放动画，直接定位
 code.hide(self)                         # 淡出
 ```
@@ -212,7 +218,7 @@ status.set_expr("fib(2)", "1 + 0 = 1")
 status.clear()
 
 hint = self.add_hint()
-hint.set("到达边界，返回")
+hint.set("到达边界，返回")  # 整幅画面底部居中，约 46px 视觉字高
 hint.clear()
 ```
 
@@ -252,11 +258,11 @@ rows = VGroup(complexity_row("时间上界  ", "2", "n", theme.RED),
 
 | 常量 | run_time / hold | 用在 |
 |---|---|---|
-| `FIRST` | 1.25 / 1.50 | 首次出现的关键规则、边界、返回 |
-| `NORMAL` | 0.85 / 0.55 | 普通的移动、连线、数值变换 |
-| `REPEAT` | 0.55 / 0.30 | 已讲清的重复步骤 |
-| `LOCAL_RESULT` | 1.00 / 1.90 | 一个完整的局部结果 |
-| `CONCLUSION` | 1.00 / 2.50 | 最终结论 |
+| `FIRST` | 1.00 / 2.30 | 首次出现的关键规则、边界、返回 |
+| `NORMAL` | 0.55 / 1.80 | 普通的移动、连线、数值变换 |
+| `REPEAT` | 0.45 / 1.60 | 已讲清的重复步骤 |
+| `LOCAL_RESULT` | 0.65 / 2.30 | 一个完整的局部结果 |
+| `CONCLUSION` | 0.70 / 3.00 | 最终结论 |
 
 这些是起点而不是累加公式。**不要**为了凑时长把整片渲染完再统一加速。
 
@@ -302,25 +308,19 @@ python tools/trace.py examples/fibonacci_recursion/fib_py.py:fib \
 # 3. 从调用树生成可运行的 scene.py 骨架
 python tools/scaffold.py traces/fib.json \
     --out examples/my_algo/scene.py --class MyAlgo \
-    --title "非记忆化递归" --tag "fib(5)"
+    --title "非记忆化递归" --tag "fib(5)" \
+    --code examples/fibonacci_recursion/code.cpp \
+    --bindings examples/fibonacci_recursion/bindings.json \
+    --params n --receivers left,right
 ```
 
 步骤 2 顺带会报告一份核对清单：调用次数、基础情况次数、各参数出现次数、
 最大深度，以及**「进入与返回是否严格交替」** —— 最后一项直接验证执行顺序
 是真实的深度优先，而不是按层展开再逐层返回。
 
-步骤 3 生成的东西：
+步骤 3 生成继承 `RecursionScene` 的场景，复用真实调用树、事件顺序、栈帧保存/恢复、居中字幕与蓝色执行代码。C++ 和代码行号映射必须显式提供；生成器不会为其他算法填入 Fibonacci 代码、假设两个分支或凭子返回值拼出求和公式。
 
-| 自动生成 | 留给人工（骨架里标了 TODO） |
-|---|---|
-| `NODES` / `CHILDREN` / `LEAF_ORDER` 三份结构数据 | C++ 展示代码 |
-| 按**真实事件顺序**排好的 `enter` / `return_value` / `fill` / `sum_node` | 标题、底部提示文案 |
-| 调用次数、深度等核对信息 | 每一段的节奏（首次讲细、重复步骤简化） |
-| 能直接跑通的完整场景类 | 结论页内容 |
-
-生成出来的骨架可以立刻 `render.py` 出片，但节奏是机器味的（每步同速）。
-**分镜和讲什么仍然是人的判断** —— 工具只是把"数 15 次调用、写 15 个节点"
-这类机械活包掉了。
+调用记录只包含调用/返回边界，不能推断中间的判断、循环、局部变量赋值或撤销操作。制作完整逐语句讲解时应补充分镜。详见 [通用递归模板](docs/recursion-template.md)。旧手写示例可能自定义位置与节奏，新生成示例在 `examples/fibonacci_recursion/scene_gen.py`；两者不要混同为已全部迁移。
 
 > 非递归算法（排序、查找、图遍历）不适用这条路：画面结构需要人选
 > （数组？图？），"哪一步值得详细讲"也不能从代码推出来。

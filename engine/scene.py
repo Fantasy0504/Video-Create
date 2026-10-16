@@ -17,7 +17,7 @@ from . import theme
 from .array import ArrayView
 from .layout import Region
 from .linkedlist import LinkedListView
-from .panel import (CodePanel, HintLine, StaticPanel, StatusLine, TitleBar)
+from .panel import (CodePanel, HintLine, StaticPanel, StackPanel, StatusLine, TitleBar)
 from .tree import TreeSpec, TreeView
 
 
@@ -36,11 +36,11 @@ class Beat:
 
 class AlgoScene(Scene):
     # ------------------------------------------------- PRD 第 3 节的节奏规范
-    NORMAL = Beat(0.85, 0.55)        # 普通的移动、连线或数值变换
-    FIRST = Beat(1.25, 1.50)         # 首次出现的关键规则、边界或返回
-    REPEAT = Beat(0.55, 0.30)        # 已讲清的重复步骤，取区间较短的一端
-    LOCAL_RESULT = Beat(1.00, 1.90)  # 一个完整的局部结果
-    CONCLUSION = Beat(1.00, 2.50)    # 最终结论
+    NORMAL = Beat(0.55, 1.80)        # 普通步骤，动作后留出阅读时间
+    FIRST = Beat(1.00, 2.30)         # 首次出现的关键规则、边界或返回
+    REPEAT = Beat(0.45, 1.60)        # 重复步骤仍可追踪，不快速闪过
+    LOCAL_RESULT = Beat(0.65, 2.30)  # 一个完整的局部结果
+    CONCLUSION = Beat(0.70, 3.00)    # 最终结论
     TRANSIT = Beat(1.00, 0.00)       # 大场景转场
 
     # ------------------------------------------------------------ 画面布局
@@ -50,15 +50,15 @@ class AlgoScene(Scene):
     CODE_CENTER = (-5.00, 1.30)      # 左侧 38%，代码块中心
     CODE_SOURCE = ()                 # C++ 代码行，逐行原样显示
     STATUS_CENTER = (-5.00, -0.95)   # 代码下方：当前调用参数与局部求和值
-    HINT_CENTER = (1.99, -3.52)      # 底部一行提示
+    HINT_CENTER = (0.0, -3.44)      # 底部一行提示
     # PRD 10.1：左侧约 38% 放代码，右侧约 62% 放图形。
-    # 画面高 8 单位，图形区用掉 6.3 —— 留得越多，深树的字号才不至于被压小。
+    # 图形区底部为最多两行字幕预留空间，节点边框不能伸入字幕带。
     # 需要同时显示两种结构时（数组 + 调用树），用 FigureRegions.split_* 切开。
-    FIGURE_REGION = Region(-2.48, 6.46, -3.28, 3.02)
+    FIGURE_REGION = Region(-2.48, 6.46, -2.35, 3.02)
 
     # 旧写法保留：不传 region 时用这组参数
     TREE_BOX = dict(top_y=3.02, row_gap=1.24, left=-2.48, right=6.46,
-                    bottom_y=-3.28)
+                    bottom_y=-2.35)
 
     # ---------------------------------------------------------------- 入口
     def construct(self):
@@ -92,6 +92,14 @@ class AlgoScene(Scene):
         """左侧代码区下方的状态行。"""
         self.status = StatusLine(self, center=self.STATUS_CENTER)
         return self.status
+
+    def add_stack(self, **kw):
+        """当前调用栈顶详情，按代码实际底边放在下方。"""
+        if hasattr(self, "code"):
+            kw.setdefault("left", max(-6.59, float(self.code.mob.get_left()[0])))
+            kw.setdefault("top", min(-1.10, float(self.code.mob.get_bottom()[1]) - 0.35))
+        self.stack_panel = StackPanel(self, **kw)
+        return self.stack_panel
 
     def add_hint(self):
         """底部提示行。"""

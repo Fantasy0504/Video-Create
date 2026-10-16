@@ -24,7 +24,8 @@ SIZE_HEADING = 30   # 约 40px
 SIZE_CODE = 23      # 约 31px
 SIZE_NODE = 21      # 约 28px
 SIZE_VALUE = 19     # 约 26px
-SIZE_HINT = 22      # 约 30px
+SIZE_HINT = 34      # 字幕按实际字形另校准至约 46px
+SUBTITLE_HEIGHT = 46 / 135  # 1080p、帧高8，每单位约135px
 SIZE_RESULT = 52    # 约 70px
 
 # ------------------------------------------------------------------ 字体

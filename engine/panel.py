@@ -1,10 +1,10 @@
 """固定位置的文字组件：标题、代码面板、状态行、底部提示、结论页。
 
 对应 PRD 2.3（文字与代码）与 10.1（画面布局）：
-* 代码保留真实语法与缩进，常规内容白色，当前行用蓝色短线定位；
+* 代码保留真实语法与缩进，非执行代码白色，当前语句文字和侧边光标蓝色；
   不给每一行加彩色底板，也不随递归进入而缩放
-* 左侧代码区下方显示"当前调用的参数和局部求和值"
-* 底部最多一行简短提示，同一阶段只使用一条
+* 递归模板的代码下方使用 StackPanel 显示当前栈帧；StatusLine 保留兼容
+* 底部整幅居中字幕，按实际字宽换行，至多两行
 
 两条踩过的经验，写在这里免得重犯：
 
@@ -20,6 +20,8 @@ import numpy as np
 from manimlib import *
 
 from . import theme
+from .text_layout import wrap_text
+from .stack_state import CallStack
 
 
 class TitleBar:
@@ -49,6 +51,7 @@ class CodePanel:
     def __init__(self, source, *, center=(-5.00, 1.30), size=None,
                  line_buff=0.155, max_width=4.10):
         self._names = {}
+        self._focused = set()
         base_size = size or theme.SIZE_CODE
         self.lines = self._render(source, base_size)
 
@@ -63,6 +66,8 @@ class CodePanel:
         self.mob = VGroup(*self.lines).arrange(DOWN, aligned_edge=LEFT,
                                                buff=line_buff)
         self.mob.move_to(np.array([center[0], center[1], 0.0]))
+        # 保留画面左侧安全边距，不能因代码块居中而裁掉行首。
+        self.mob.shift(RIGHT * max(0.0, -FRAME_WIDTH / 2 + 0.52 - self.mob.get_left()[0]))
 
         self.cursors = []
         for line in self.lines:
@@ -74,12 +79,28 @@ class CodePanel:
 
     @staticmethod
     def _render(source, font_size):
-        # 按行挑字体：等宽字体没有中文字形，代码里带中文注释会渲染成乱码
-        # （Consolas 下会退化成一串十六进制方块）。含中文的行改用中文字体，
-        # 代价是那一行的拉丁字符不再是等宽，所以注释尽量放行尾、别参与对齐。
-        return [Text(text, font=theme.pick_font(text),
-                     font_size=font_size, color=theme.WHITE)
-                for text in source]
+        # Text 的可见包围盒不包含前导空格，直接左对齐会丢缩进。
+        # 用透明行框保留统一左边界，再将文字按缩进放入行框。
+        texts, indents = [], []
+        for raw in source:
+            text = raw.expandtabs(4)
+            body = text.lstrip(" ")
+            font = theme.pick_font(text)
+            count = len(text) - len(body)
+            cell = Text("M M", font=font, font_size=font_size).get_width() - Text(
+                "MM", font=font, font_size=font_size).get_width()
+            mob = Text(body or " ", font=font, font_size=font_size, color=theme.WHITE)
+            texts.append(mob)
+            indents.append(count * cell)
+        width = max((m.get_width() + x for m, x in zip(texts, indents)), default=0.1)
+        height = max((m.get_height() for m in texts), default=0.2)
+        rows = []
+        for mob, indent in zip(texts, indents):
+            anchor = Rectangle(width=max(width, 0.01), height=max(height, 0.01))
+            anchor.set_stroke(opacity=0).set_fill(opacity=0)
+            mob.move_to(anchor.get_left() + RIGHT * (indent + mob.get_width() / 2))
+            rows.append(VGroup(anchor, mob))
+        return rows
 
     def bind(self, **names):
         """把有意义的名字绑到行号，例如 ``bind(base=1, left=2, right=3)``。"""
@@ -102,22 +123,32 @@ class CodePanel:
         )
         scene.add(*self.cursors)
 
+    def _indices(self, target):
+        targets = target if isinstance(target, (tuple, list)) else [target]
+        indices = {self._index(t) for t in targets}
+        if any(i < 0 or i >= len(self.lines) for i in indices):
+            raise IndexError("执行行超出代码范围")
+        return indices
+
     def focus_now(self, target):
-        """不播放动画，直接把蓝色光标定位到某一行。"""
-        idx = self._index(target)
-        for i, cursor in enumerate(self.cursors):
-            cursor.set_stroke(opacity=1.0 if i == idx else 0.0)
+        """原位改色，不创建代码副本；支持多行逻辑语句。"""
+        indices = self._indices(target)
+        for i, (line, cursor) in enumerate(zip(self.lines, self.cursors)):
+            line.set_color(theme.BLUE if i in indices else theme.WHITE)
+            cursor.set_stroke(opacity=1.0 if i in indices else 0.0)
+        self._focused = indices
 
     def focus(self, scene, target, run_time=0.24):
-        """把蓝色光标移到指定行，其他行隐藏。"""
-        idx = self._index(target)
+        indices = self._indices(target)
+        changed = self._focused ^ indices
         anims = []
-        for i, cursor in enumerate(self.cursors):
-            want = 1.0 if i == idx else 0.0
-            if abs(cursor.get_stroke_opacity() - want) > 0.01:
-                anims.append(cursor.animate.set_stroke(opacity=want))
+        for i in changed:
+            active = i in indices
+            anims.extend((self.lines[i].animate.set_color(theme.BLUE if active else theme.WHITE),
+                          self.cursors[i].animate.set_stroke(opacity=1.0 if active else 0.0)))
         if anims:
             scene.play(*anims, run_time=run_time)
+        self._focused = indices
 
     def hide(self, scene, run_time=0.40):
         scene.play(FadeOut(self.mob),
@@ -222,33 +253,124 @@ class StaticPanel:
             self.mob = None
 
 
-class HintLine:
-    """底部最多一行的简短提示。"""
+def wrapped_rows(text, size, max_width, color=theme.WHITE):
+    def make(value):
+        return Text(value or " ", font=theme.pick_font(value),
+                    font_size=size, color=color)
+    measure = lambda value: make(value).get_width() if value else 0.0
+    return [make(line) for line in wrap_text(text, max_width, measure)]
 
-    def __init__(self, scene, *, center=(1.99, -3.52), size=None):
-        self.scene = scene
-        self.pos = np.array([center[0], center[1], 0.0])
-        self.size = size or theme.SIZE_HINT
+
+def replace_panel(panel, new, run_time):
+    # 顺序淡出/淡入，保证不同文字不会在同一位置交叉叠字。
+    if panel.mob is not None:
+        old = panel.mob
+        panel.scene.play(FadeOut(old), run_time=run_time / 2)
+        panel.scene.remove(old)
+    panel.mob = new
+    panel.scene.play(FadeIn(new), run_time=run_time / 2)
+
+
+class StackPanel:
+    """代码下方的当前栈帧详情；保存每一层自己的参数与局部变量。"""
+    def __init__(self, scene, *, left=-6.59, top=-1.10, width=4.10,
+                 bottom=-2.65, size=None):
+        self.scene, self.left, self.top = scene, left, top
+        self.width, self.bottom = width, bottom
+        self.size = size or theme.SIZE_NODE
+        self.stack = CallStack()
         self.mob = None
 
-    def set(self, text, run_time=0.30):
-        new = Text(text, font=theme.chinese_font(),
-                   font_size=self.size, color=theme.WHITE)
-        new.move_to(self.pos)
-        if self.mob is None:
-            self.mob = new
-            self.scene.play(FadeIn(self.mob, shift=UP * 0.07), run_time=run_time)
+    def show_current(self, run_time=0.30):
+        frame = self.stack.current
+        if frame is None:
+            self.clear(run_time)
             return
-        # 同 StatusLine：整块换掉，避免 Transform 的点集插值留下残影
-        old = self.mob
-        self.mob = new
-        self.scene.play(FadeOut(old, run_time=run_time * 0.6),
-                        FadeIn(new, run_time=run_time * 0.6))
-        self.scene.remove(old)
+        fields = [(f"当前调用 第{len(self.stack.frames)}层", theme.BLUE),
+                  (f"{frame.name}  #{frame.call_id}", theme.WHITE)]
+        fields += [(f"{k} = {v}", theme.WHITE) for k, v in frame.params.items()]
+        fields += [(f"{k} = {v}", theme.GREEN if k == frame.changed else theme.WHITE)
+                   for k, v in frame.locals.items()]
+        if frame.received:
+            fields.append((frame.received, theme.GREEN))
+        fields.append((frame.state, theme.WHITE))
+        rows = []
+        for text, color in fields:
+            rows.extend(wrapped_rows(text, self.size, self.width, color))
+        header, rows = rows[0], rows[1:]
+        # 高度不够则按字段分页展示；每页保留当前层级，不缩字，不覆盖字幕带。
+        available = self.top - self.bottom - header.get_height() - 0.10
+        pages, page, height = [], [], 0.0
+        for row in rows:
+            h = row.get_height() + (0.10 if page else 0.0)
+            if row.get_height() > available:
+                raise ValueError("栈帧区域高度不足，请调整布局")
+            if page and height + h > available:
+                pages.append(page)
+                page, height = [], 0.0
+                h = row.get_height()
+            page.append(row)
+            height += h
+        if page:
+            pages.append(page)
+        for index, page in enumerate(pages):
+            block = VGroup(header.copy(), *page).arrange(DOWN, aligned_edge=LEFT, buff=0.10)
+            block.shift(np.array([self.left, self.top, 0.0]) - block.get_corner(UL))
+            replace_panel(self, block, run_time)
+            if index + 1 < len(pages):
+                self.scene.wait(2.0)
+
+    def push(self, call_id, name, params=None, locals=None, run_time=0.30):
+        self.stack.push(call_id, name, params, locals)
+        self.show_current(run_time)
+
+    def update(self, *, locals=None, state=None, changed="", run_time=0.30):
+        self.stack.update(locals=locals, state=state, changed=changed)
+        self.show_current(run_time)
+
+    def pop(self, call_id, value=None, *, receiver=None, has_value=True, run_time=0.30):
+        self.stack.pop(call_id, value, receiver=receiver, has_value=has_value)
+        self.show_current(run_time)
 
     def clear(self, run_time=0.30):
         if self.mob is not None:
             self.scene.play(FadeOut(self.mob), run_time=run_time)
+            self.scene.remove(self.mob)
+            self.mob = None
+
+
+class HintLine:
+    """整幅画面底部居中字幕；字形高度按 1080p 的 46px 校准。"""
+    def __init__(self, scene, *, center=(0.0, -3.44), size=None,
+                 max_width=13.10):
+        self.scene = scene
+        self.pos = np.array([center[0], center[1], 0.0])
+        self.size = size or theme.SIZE_HINT
+        self.max_width = max_width
+        self.mob = None
+
+    def set(self, text, run_time=0.30):
+        sample = Text("递归调用", font=theme.chinese_font(), font_size=self.size)
+        factor = theme.SUBTITLE_HEIGHT / max(sample.get_height(), 1e-6)
+        rows = wrapped_rows(text, self.size, self.max_width / factor)
+        if len(rows) > 2:
+            raise ValueError("字幕超过两行，请按语义拆为多条字幕依次显示")
+        # 固定实际字形高度，而不是假定 font_size 等于像素。
+        target_h = theme.SUBTITLE_HEIGHT
+        for row in rows:
+            row.scale(factor)
+            if row.get_width() > self.max_width:
+                raise ValueError("字幕按目标字高排版后过宽，请拆分句子")
+        new = VGroup(*rows).arrange(DOWN, buff=0.10)
+        # 底边固定，两行字幕向上扩展。
+        bottom = self.pos[1] - target_h / 2
+        new.move_to(np.array([self.pos[0], bottom + new.get_height() / 2, 0.0]))
+        replace_panel(self, new, run_time)
+
+    def clear(self, run_time=0.30):
+        if self.mob is not None:
+            self.scene.play(FadeOut(self.mob), run_time=run_time)
+            self.scene.remove(self.mob)
             self.mob = None
 
 
